@@ -6,6 +6,16 @@ const PORT = process.env.PORT || 8000;
 
 const app = express();
 
+declare global {
+  namespace Express {
+    interface User {
+      id: number
+      uname: string
+      password: string
+    }
+  }
+}
+
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(
