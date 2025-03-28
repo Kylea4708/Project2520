@@ -1,5 +1,5 @@
 import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
+import { IVerifyOptions, Strategy as LocalStrategy } from "passport-local";
 import {
   getUserByEmailIdAndPassword,
   getUserById,
@@ -11,7 +11,7 @@ const localLogin = new LocalStrategy(
     usernameField: "uname",
     passwordField: "password",
   },
-  async (uname: any, password: any, done: any) => {
+  async (uname: string, password: string, done:(error: any, user?: Express.User | false, options?: IVerifyOptions) => void) => {
     // ⭐ TODO for Students: Show the login error message on the login page
     const user = await getUserByEmailIdAndPassword(uname, password);
     return user
@@ -23,9 +23,11 @@ const localLogin = new LocalStrategy(
 );
 
 // ⭐ TODO for Students: Fix Passport Types so they don't say any
-passport.serializeUser(function (user: any, done: any) {
+passport.serializeUser(function (user: Express.User, done: (err: any, id?: number) => void) {
   done(null, user.id);
 });
+
+
 
 // ⭐ TODO for Students: Fix Passport Types so they don't say any
 passport.deserializeUser(function (id: any, done: any) {
