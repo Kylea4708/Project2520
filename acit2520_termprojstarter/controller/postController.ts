@@ -15,10 +15,10 @@ export const showPost = (req: Request, res: Response) => {
       return res.status(404).render('404', { message: 'Post not found' });
     }
     
-    // Render the individualPost.ejs template with the post data
+   
     res.render('posts/individualPost', { 
       post,
-      user: req.user // Pass the user data if available
+      user: req.user 
     });
     
   } catch (error) {
@@ -26,3 +26,4 @@ export const showPost = (req: Request, res: Response) => {
     res.status(500).send('Server error');
   }
 };
+
