@@ -193,6 +193,6 @@ export {
   deletePost,
   getSubs,
   addComment,
-  decoratePost,
+  decoratePost, users,
 };
 
