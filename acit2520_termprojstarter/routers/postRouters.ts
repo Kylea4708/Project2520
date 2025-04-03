@@ -102,6 +102,7 @@ router.get("/show/:postid", async (req, res) => {
         message: "Post not found",
       });
     }
+    //temp to check if user validation is working
     console.log("✅ Logged-in user ID:", req.user ? req.user.id : "No user");
     console.log(
       "📌 Post Creator ID:",
