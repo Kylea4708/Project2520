@@ -12,96 +12,94 @@
     <title>Post</title>
   </head>
   <body>
+    <p>User: <%= user ? JSON.stringify(user) : "No user" %></p>
+
     <main class="container">
       <!-- Error/Success Messages -->
       <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert error">
-          <%= error %>
-        </div>
+      <div class="alert error"><%= error %></div>
       <% } %>
-  
+
       <div class="authOptions">
         <h1><%= post.title %></h1>
         <a href="/posts" role="button">Home</a>
       </div>
-  
+
       <!-- Post Content -->
       <article class="post-container">
         <% if (post.link) { %>
-          <p><a href="<%= post.link %>" target="_blank"><%= post.link %></a></p>
+        <p><a href="<%= post.link %>" target="_blank"><%= post.link %></a></p>
         <% } %>
-        
+
         <p><%= post.description %></p>
-  
+
         <!-- Post Meta -->
         <div class="post-meta">
           <small>
-            Posted by 
-            <% if (post.creator && post.creator.uname) { %>
-              <strong><%= post.creator.uname %></strong>
-            <% } else { %>
-              [User#<%= post.creator?.id || 'Unknown' %>]
-            <% } %>
+            Posted by <% if (post.creator && post.creator.uname) { %>
+            <strong><%= post.creator.uname %></strong>
+            <% } else { %> [User#<%= post.creator?.id || 'Unknown' %>] <% } %>
             on <%= new Date(post.timestamp).toLocaleString() %>
           </small>
         </div>
-  
+        <p>Debug Info:</p>
+        <p>User ID: <%= user ? user.id : "Not logged in" %></p>
+        <p>Post Creator ID: <%= post.creator ? post.creator.id : "Unknown" %></p>
+        <p>isCreator: <%= isCreator %></p>
         <!-- Post Actions (Edit/Delete) -->
-        <% if (isCreator) { %>
+       
           <div class="post-actions">
             <a href="/posts/edit/<%= post.id %>" role="button">Edit Post</a>
-            <a href="/posts/delete/<%= post.id %>" role="button" 
-               onclick="return confirm('Are you sure you want to delete this post?')">
+        
+            <!-- Link to Delete Confirmation Page -->
+            <a href="/posts/deleteconfirm/<%= post.id %>" role="button" style="background: red; color: white;">
               Delete Post
             </a>
           </div>
-        <% } %>
-      </article>
-  
+     
+
       <!-- Comments Section -->
       <section class="comments-section">
         <h2>Comments (<%= post.comments.length %>)</h2>
-        
+
         <% if (post.comments.length === 0) { %>
-          <p>No comments yet. Be the first to comment!</p>
-        <% } else { %>
-          <% post.comments.forEach(comment => { %>
-            <div class="comment">
-              <p><%= comment.description %></p>
-              <div class="comment-meta">
-                By 
-                <% if (comment.creator && comment.creator.uname) { %>
-                  <%= comment.creator.uname %>
-                <% } else { %>
-                  [User#<%= comment.creator?.id || 'Unknown' %>]
-                <% } %>
-                on <%= new Date(comment.timestamp).toLocaleString() %>
-                
-                <% if (user && comment.creator && user.id === comment.creator.id) { %>
-                  | <a href="/comments/delete/<%= comment.id %>" 
-                       onclick="return confirm('Delete this comment?')">Delete</a>
-                <% } %>
-              </div>
-            </div>
-          <% }); %>
-        <% } %>
+        <p>No comments yet. Be the first to comment!</p>
+        <% } else { %> <% post.comments.forEach(comment => { %>
+        <div class="comment">
+          <p><%= comment.description %></p>
+          <div class="comment-meta">
+            By <% if (comment.creator && comment.creator.uname) { %> <%=
+            comment.creator.uname %> <% } else { %> [User#<%=
+            comment.creator?.id || 'Unknown' %>] <% } %> on <%= new
+            Date(comment.timestamp).toLocaleString() %> <% if (user &&
+            comment.creator && user.id === comment.creator.id) { %> |
+            <a
+              href="/comments/delete/<%= comment.id %>"
+              onclick="return confirm('Delete this comment?')"
+              >Delete</a
+            >
+            <% } %>
+          </div>
+        </div>
+        <% }); %> <% } %>
       </section>
-  
+
       <!-- Comment Form -->
       <% if (user) { %>
-        <section class="comment-form">
-          <h3>Add Comment</h3>
-          <form action="/comments/create/<%= post.id %>" method="POST">
-            <textarea 
-              name="description" 
-              rows="4" 
-              placeholder="Write your comment here..."
-              required></textarea>
-            <button type="submit">Submit Comment</button>
-          </form>
-        </section>
+      <section class="comment-form">
+        <h3>Add Comment</h3>
+        <form action="/comments/create/<%= post.id %>" method="POST">
+          <textarea
+            name="description"
+            rows="4"
+            placeholder="Write your comment here..."
+            required
+          ></textarea>
+          <button type="submit">Submit Comment</button>
+        </form>
+      </section>
       <% } else { %>
-        <p><a href="/auth/login">Login</a> to post a comment</p>
+      <p><a href="/auth/login">Login</a> to post a comment</p>
       <% } %>
     </main>
   </body>
