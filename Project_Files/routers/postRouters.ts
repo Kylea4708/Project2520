@@ -113,10 +113,54 @@ router.get("/show/:postid", async (req, res) => {
 
 router.get("/edit/:postid", ensureAuthenticated, async (req, res) => {
   // ⭐ TODO
+  const postId = parseInt(req.params.postid);
+  const post = getPost(postId);
+
+  res.render("editPost", {
+    user: req.user,
+    subs: getSubs(), // Assuming you want the subs list like in /create
+    formData: {
+      title: post.title,
+      link: post.link,
+      description: post.description,
+      subgroup: post.subgroup
+    }
+  })
 });
 
 router.post("/edit/:postid", ensureAuthenticated, async (req, res) => {
   // ⭐ TODO
+  try {
+    const postId = parseInt(req.params.postid);
+    const post = getPost(postId);
+    
+    if (isNaN(postId)) {
+      return res.status(400).render("error", {message: "Post doesn't exist"})
+    }
+
+    if (!post) {
+      return res.status(404).render("error", { 
+        message: "Post not found" 
+      });
+    }
+
+    const user = await req.user
+    if (!user || user.id !== post.creator.id) {
+      res.status(403).render("error", {message: "user is not the creator of the post"})
+    }
+
+    post.title = req.body.title
+    post.link = req.body.link
+    post.description = req.body.description
+    post.subgroup = req.body.subgroup
+
+
+  } catch (err) {
+    console.error("Error showing post:", err);
+    res.status(500).render("error", { 
+      message: "An error occurred while loading the post" 
+    });
+  }
 });
 
 router.get("/deleteconfirm/:postid", ensureAuthenticated, async (req, res) => {

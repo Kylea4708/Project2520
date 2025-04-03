@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.classless.min.css"
+    />
+    <link href="/css/style.css" rel="stylesheet" />
+    <title>Edit Post</title>
+  </head>
+  <body>
+    <main>
+      <div class="authOptions">
+        <h1>Edit Post</h1>
+        <a role="button" href="/posts">Home</a>
+      </div>
+
+      <% if (error) { %>
+        <p class="error"><%= error %></p>
+      <% } %>
+
+      <form action="/posts/edit/<%= post.id %>" method="POST">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" value="<%= formData.title %>" required />
+
+        <label for="link">Link (optional):</label>
+        <input type="url" id="link" name="link" value="<%= formData.link %>" />
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required><%= formData.description %></textarea>
+
+        <label for="subgroup">Subgroup:</label>
+        <select id="subgroup" name="subgroup" required>
+          <% subs.forEach(sub => { %>
+            <option value="<%= sub %>" <%= sub === formData.subgroup ? 'selected' : '' %>><%= sub %></option>
+          <% }) %>
+        </select>
+
+        <button type="submit">Update Post</button>
+        <a role="button" href="/posts/show/<%= post.id %>">Cancel</a>
+      </form>
+    </main>
+  </body>
+</html>
