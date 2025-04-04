@@ -88,7 +88,7 @@
       <% if (user) { %>
       <section class="comment-form">
         <h3>Add Comment</h3>
-        <form action="/comments/create/<%= post.id %>" method="POST">
+        <form action="/posts/comment-create/<%= post.id %>" method="POST">
           <textarea
             name="description"
             rows="4"

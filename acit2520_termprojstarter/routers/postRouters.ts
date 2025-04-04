@@ -10,8 +10,10 @@ import {
   users,
   deletePost,
   editPost,
+  addComment,
 } from "../fake-db";
 import { TPost, TPosts, TUsers, TComments, TVotes } from "../types";
+import { timeStamp } from "console";
 
 router.get("/", async (req, res) => {
   const posts = await getPosts(20);
@@ -122,7 +124,6 @@ router.get("/show/:postid", async (req, res) => {
 
 
 router.get("/editpost/:postid", ensureAuthenticated, async (req, res) => {
-  // ⭐ TODO
   try {
     const postId = parseInt(req.params.postid);
     const post = getPost(postId);
@@ -160,7 +161,6 @@ router.get("/editpost/:postid", ensureAuthenticated, async (req, res) => {
 });
 
 router.post("/edit/:postid", ensureAuthenticated, async (req, res) => {
-  // ⭐ TODO
   try {
     const { title, link, description, subgroup } = req.body;
     const postId = parseInt(req.params.postid);
@@ -198,7 +198,7 @@ router.post("/edit/:postid", ensureAuthenticated, async (req, res) => {
       });
     }
 
-    const edited = editPost(
+    editPost(
       postId,
       {
         title,
@@ -261,7 +261,43 @@ router.post(
   "/comment-create/:postid",
   ensureAuthenticated,
   async (req, res) => {
-    // ⭐ TODO
+    // remember how GET /posts/show/:postid has a form for comments? It submits to here. Look there
+
+  try {
+    const { description } = req.body
+    const user = await req.user
+    const postId = parseInt(req.params.postid);
+    const post = getPost(postId);
+    
+    if (!user) {
+      throw new Error("User session expired");
+    }
+    
+    if (!post) {
+      return res.status(404).render("error", {
+        message: "Post not found",
+      });
+    }
+    
+    if (!description) {
+      return res.redirect(`/posts/show/${postId}?error=Comment can't be empty`)
+    }
+
+    const newcomment = addComment(
+      postId,
+      user.id,
+      description,
+    )
+
+    return res.redirect(`/posts/show/${postId}`);
+  } catch (err) {
+    
+    console.error("Comment creation error:", err);
+    
+    const postId = parseInt(req.params.postid)
+
+    return res.redirect(`/posts/show/${postId}?error=Error creating comment`);
+    }
   }
 );
 
