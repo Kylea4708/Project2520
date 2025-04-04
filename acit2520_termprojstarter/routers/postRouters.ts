@@ -1,9 +1,16 @@
 import express from "express";
 const router = express.Router();
 import { ensureAuthenticated } from "../middleware/checkAuth";
-import { getPosts, getSubs, getUser, getPost, addPost, users } from "../fake-db";
-import {TPost, TPosts, TUsers, TComments, TVotes, } from '../types';
-
+import {
+  getPosts,
+  getSubs,
+  getUser,
+  getPost,
+  addPost,
+  users,
+  deletePost,
+} from "../fake-db";
+import { TPost, TPosts, TUsers, TComments, TVotes } from "../types";
 
 router.get("/", async (req, res) => {
   const posts = await getPosts(20);
@@ -16,18 +23,18 @@ router.get("/create", ensureAuthenticated, (req, res) => {
     user: req.user,
     subs: getSubs(),
     formData: {
-      title: '',
-      link: '',
-      description:'',
-      subgroup: ''
-    }
+      title: "",
+      link: "",
+      description: "",
+      subgroup: "",
+    },
   });
 });
 
 router.post("/create", ensureAuthenticated, async (req, res) => {
   try {
     const { title, link, description, subgroup } = req.body;
-    
+
     // Ensure user is resolved
     const user = await req.user;
     if (!user) {
@@ -51,7 +58,7 @@ router.post("/create", ensureAuthenticated, async (req, res) => {
         user,
         subs: getSubs(),
         error: "Title and subgroup are required",
-        formData: req.body
+        formData: req.body,
       });
     }
 
@@ -60,7 +67,7 @@ router.post("/create", ensureAuthenticated, async (req, res) => {
         user,
         subs: getSubs(),
         error: "Post must contain either a link or description",
-        formData: req.body
+        formData: req.body,
       });
     }
 
@@ -74,14 +81,13 @@ router.post("/create", ensureAuthenticated, async (req, res) => {
     );
 
     return res.redirect(`/posts/show/${newPost.id}`);
-    
   } catch (err) {
     console.error("Post creation error:", err);
     return res.render("createPosts", {
       user: req.user,
       subs: getSubs(),
       error: err,
-      formData: req.body
+      formData: req.body,
     });
   }
 });
@@ -89,86 +95,126 @@ router.post("/create", ensureAuthenticated, async (req, res) => {
 router.get("/show/:postid", async (req, res) => {
   try {
     const postId = parseInt(req.params.postid);
-    const post = getPost(postId);
-    
+    const post = await getPost(postId);
+
     if (!post) {
-      return res.status(404).render("error", { 
-        message: "Post not found" 
+      return res.status(404).render("error", {
+        message: "Post not found",
       });
     }
+    //temp to check if user validation is working
+    console.log("✅ Logged-in user ID:", req.user ? req.user.id : "No user");
+    console.log(
+      "📌 Post Creator ID:",
+      post.creator ? post.creator.id : "No creator"
+    );
 
     res.render("individualPost", {
       post,
       user: req.user,
-      isCreator: req.user?.id === post.creator.id
+      isCreator: req.user?.id === post.creator.id,
     });
   } catch (err) {
     console.error("Error showing post:", err);
-    res.status(500).render("error", { 
-      message: "An error occurred while loading the post" 
-    });
   }
 });
 
 
 router.get("/edit/:postid", ensureAuthenticated, async (req, res) => {
   // ⭐ TODO
-  const postId = parseInt(req.params.postid);
-  const post = getPost(postId);
+  /*
+  try {
+    const { title, link, description, subgroup } = req.body;
+    const user = await req.user;
+    const postId = parseInt(req.params.postid);
+    const post = getPost(postId);
 
-  res.render("editPost", {
-    user: req.user,
-    subs: getSubs(), // Assuming you want the subs list like in /create
-    formData: {
-      title: post.title,
-      link: post.link,
-      description: post.description,
-      subgroup: post.subgroup
+    // form for editing an existing post
+    res.render("editPost", {
+      post,
+      user: req.user,
+      isCreator: req.user?.id === post.creator.id
+    })
+
+    // What parts of the post can be edited
+
+    if (!title || !subgroup) {
+      return res.render("createPosts", {
+        user,
+        subs: getSubs(),
+        error: "Title and subgroup are required",
+        formData: req.body
+      });
     }
-  })
+
+    if (!link && !description) {
+      return res.render("createPosts", {
+        user,
+        subs: getSubs(),
+        error: "Post must contain either a link or description",
+        formData: req.body
+      });
+    }
+
+    const editedpost = editPost(
+      changes: {
+        title,
+        link || "",
+        description,
+        subgroup
+      })
+  } catch (err) {
+    // Shouldn't be loaded unless you are a correct user
+    console.error("error on edit:", err)
+    res.status(500).render("error", {
+      message: "An error occured when loading the post to edit"
+    })
+  }
+ */ 
 });
 
 router.post("/edit/:postid", ensureAuthenticated, async (req, res) => {
   // ⭐ TODO
-  try {
-    const postId = parseInt(req.params.postid);
-    const post = getPost(postId);
-    
-    if (isNaN(postId)) {
-      return res.status(400).render("error", {message: "Post doesn't exist"})
-    }
 
-    if (!post) {
-      return res.status(404).render("error", { 
-        message: "Post not found" 
-      });
-    }
-
-    const user = await req.user
-    if (!user || user.id !== post.creator.id) {
-      res.status(403).render("error", {message: "user is not the creator of the post"})
-    }
-
-    post.title = req.body.title
-    post.link = req.body.link
-    post.description = req.body.description
-    post.subgroup = req.body.subgroup
-
-
-  } catch (err) {
-    console.error("Error showing post:", err);
-    res.status(500).render("error", { 
-      message: "An error occurred while loading the post" 
-    });
-  }
+  // redirect back to post when done
+  
 });
 
 router.get("/deleteconfirm/:postid", ensureAuthenticated, async (req, res) => {
-  // ⭐ TODO
+  try {
+    const postId = parseInt(req.params.postid);
+    const post = await getPost(postId);
+
+    if (!post) {
+      console.error("post not found");
+    }
+
+    if (!req.user || req.user.id !== post.creator.id) {
+      console.error("unauthorized");
+    }
+
+    return res.render("delete_confirm", { post, user: req.user });
+  } catch (err) {
+    console.error("server error");
+  }
 });
 
 router.post("/delete/:postid", ensureAuthenticated, async (req, res) => {
-  // ⭐ TODO
+  try {
+    const postId = parseInt(req.params.postid);
+    const post = await getPost(postId);
+
+    await deletePost(postId);
+    console.log(`Post with ID ${postId} deleted successfully.`);
+    return res.redirect("/posts");
+  } catch (err) {
+    console.error("Error during deletion:", err);
+    if (err instanceof Error) {
+      res.status(500).send(err.message);
+    } else {
+      res.status(500).send("An unexpected error occurred.");
+    }
+  }
 });
 
 router.post(
