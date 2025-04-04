@@ -119,8 +119,65 @@ router.get("/show/:postid", async (req, res) => {
   }
 });
 
+
+router.get("/edit/:postid", ensureAuthenticated, async (req, res) => {
+  // ⭐ TODO
+  /*
+  try {
+    const { title, link, description, subgroup } = req.body;
+    const user = await req.user;
+    const postId = parseInt(req.params.postid);
+    const post = getPost(postId);
+
+    // form for editing an existing post
+    res.render("editPost", {
+      post,
+      user: req.user,
+      isCreator: req.user?.id === post.creator.id
+    })
+
+    // What parts of the post can be edited
+
+    if (!title || !subgroup) {
+      return res.render("createPosts", {
+        user,
+        subs: getSubs(),
+        error: "Title and subgroup are required",
+        formData: req.body
+      });
+    }
+
+    if (!link && !description) {
+      return res.render("createPosts", {
+        user,
+        subs: getSubs(),
+        error: "Post must contain either a link or description",
+        formData: req.body
+      });
+    }
+
+    const editedpost = editPost(
+      changes: {
+        title,
+        link || "",
+        description,
+        subgroup
+      })
+  } catch (err) {
+    // Shouldn't be loaded unless you are a correct user
+    console.error("error on edit:", err)
+    res.status(500).render("error", {
+      message: "An error occured when loading the post to edit"
+    })
+  }
+ */ 
+});
+
 router.post("/edit/:postid", ensureAuthenticated, async (req, res) => {
   // ⭐ TODO
+
+  // redirect back to post when done
+  
 });
 
 router.get("/deleteconfirm/:postid", ensureAuthenticated, async (req, res) => {

@@ -6,12 +6,12 @@ const PORT = process.env.PORT || 8000;
 
 const app = express();
 
-declare global{
-  namespace Express{
-    interface User{
-      id:number;
-      uname: string;
-      password: string;
+declare global {
+  namespace Express {
+    interface User {
+      id: number
+      uname: string
+      password: string
     }
   }
 }
