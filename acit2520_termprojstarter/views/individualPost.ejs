@@ -25,6 +25,11 @@
         <a href="/posts" role="button">Home</a>
       </div>
 
+      <p>DEBUG - User ID: <%= user ? user.id : 'No user' %></p>
+      <p>DEBUG - Creator ID: <%= post.creator ? post.creator.id : 'No creator' %></p>
+      <p>DEBUG - isCreator value: <%= isCreator %></p>
+      <p>DEBUG - Direct comparison: <%= user && post.creator ? (Number(user.id) === Number(post.creator.id)) : false %></p>
+      
       <!-- Post Content -->
       <article class="post-container">
         <% if (post.link) { %>
