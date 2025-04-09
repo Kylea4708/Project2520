@@ -1,7 +1,7 @@
 const { ensureAuthenticated } = require("../middleware/checkAuth");
 import express from "express";
 import * as database from "../controller/postController";
-import { getSubs, getPosts } from "../fake-db";
+import { getSubs, getPosts, getUser } from "../fake-db";
 const router = express.Router();
 
 router.get("/list", async (req, res) => {
@@ -33,8 +33,18 @@ router.get("/show/:subname", async (req, res) => {
     const allPosts = getPosts();
     const postsInSub = allPosts.filter((post) => post.subgroup === subname);
     res.render("sub", { subname, posts: postsInSub });
-    //console.log("Rendering template with:", { subname, posts: postsInSub });
   } catch (error) {
+    res.status(500).send("server error");
+  }
+});
+
+router.get("/subs/show/:subname", async (req, res) => {
+  try {
+    const subname = req.params.subname;
+    const allPosts = await getPosts();
+    const postsInSub = allPosts.filter((post) => post.subgroup === subname);
+    res.render(`Posts relating to ${subname}`, { subname, postsInSub });
+  } catch (err) {
     res.status(500).send("server error");
   }
 });

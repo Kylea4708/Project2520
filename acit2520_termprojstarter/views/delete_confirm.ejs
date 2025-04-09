@@ -28,9 +28,11 @@
 
       <!-- Delete Form -->
       <form action="/posts/delete/<%= post.id %>" method="POST">
+        <input type="hidden" name="subname" value="<%= post.subgroup %>" />
         <button type="submit" style="background: red; color: white">
           Yes, Delete
         </button>
+      </form>
         <a href="/posts/<%= post.id %>" role="button">Cancel</a>
       </form>
     </main>

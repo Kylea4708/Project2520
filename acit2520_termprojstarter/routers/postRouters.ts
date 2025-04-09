@@ -102,12 +102,6 @@ router.get("/show/:postid", async (req, res) => {
         message: "Post not found",
       });
     }
-    //temp to check if user validation is working
-    console.log("✅ Logged-in user ID:", req.user ? req.user.id : "No user");
-    console.log(
-      "📌 Post Creator ID:",
-      post.creator ? post.creator.id : "No creator"
-    );
 
     res.render("individualPost", {
       post,
@@ -146,10 +140,10 @@ router.post("/delete/:postid", ensureAuthenticated, async (req, res) => {
   try {
     const postId = parseInt(req.params.postid);
     const post = await getPost(postId);
-
+    const subname = req.params.subname;
     await deletePost(postId);
     console.log(`Post with ID ${postId} deleted successfully.`);
-    return res.redirect("/posts");
+    return res.redirect(`/subs/show/${subname}`);
   } catch (err) {
     console.error("Error during deletion:", err);
     if (err instanceof Error) {

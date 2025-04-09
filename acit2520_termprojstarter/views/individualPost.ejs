@@ -12,7 +12,6 @@
     <title>Post</title>
   </head>
   <body>
-    <p>User: <%= user ? JSON.stringify(user) : "No user" %></p>
 
     <main class="container">
       <!-- Error/Success Messages -->
@@ -42,12 +41,8 @@
             on <%= new Date(post.timestamp).toLocaleString() %>
           </small>
         </div>
-        <p>Debug Info:</p>
-        <p>User ID: <%= user ? user.id : "Not logged in" %></p>
-        <p>Post Creator ID: <%= post.creator ? post.creator.id : "Unknown" %></p>
-        <p>isCreator: <%= isCreator %></p>
         <!-- Post Actions (Edit/Delete) -->
-       
+        <% if (isCreator) { %>
           <div class="post-actions">
             <a href="/posts/edit/<%= post.id %>" role="button">Edit Post</a>
         
@@ -56,7 +51,7 @@
               Delete Post
             </a>
           </div>
-     
+          <% } %>
 
       <!-- Comments Section -->
       <section class="comments-section">
