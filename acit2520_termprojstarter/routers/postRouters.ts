@@ -106,7 +106,6 @@ router.get("/show/:postid", async (req, res) => {
       });
     }
 
-
     res.render("individualPost", {
       post,
       user: req.user,
@@ -119,7 +118,7 @@ router.get("/show/:postid", async (req, res) => {
 
 router.post("/edit/:postid", ensureAuthenticated, async (req, res) => {
   // ⭐ TODO
-=======
+});
 
 router.get("/editpost/:postid", ensureAuthenticated, async (req, res) => {
   try {
@@ -136,26 +135,23 @@ router.get("/editpost/:postid", ensureAuthenticated, async (req, res) => {
 
     if (user?.id !== Number(post.creator.id)) {
       return res.status(403).render("error", {
-        message: "You do not have permission to edit this post"}
-      )
+        message: "You do not have permission to edit this post",
+      });
     }
 
-    
     // What parts of the post can be edited
     res.render("edit_post", {
       post,
       user,
       subs: getSubs(),
-    })
-    
+    });
   } catch (err) {
     // Shouldn't be loaded unless you are a correct user
-    console.error("error on edit:", err)
+    console.error("error on edit:", err);
     res.status(500).render("error", {
-      message: "An error occured when loading the post to edit"
-    })
+      message: "An error occured when loading the post to edit",
+    });
   }
-
 });
 
 router.post("/edit/:postid", ensureAuthenticated, async (req, res) => {
@@ -174,8 +170,8 @@ router.post("/edit/:postid", ensureAuthenticated, async (req, res) => {
 
     if (user?.id !== Number(post.creator.id)) {
       return res.status(403).render("error", {
-        message: "You do not have permission to edit this post"}
-      )
+        message: "You do not have permission to edit this post",
+      });
     }
 
     if (!title || !subgroup) {
@@ -196,15 +192,12 @@ router.post("/edit/:postid", ensureAuthenticated, async (req, res) => {
       });
     }
 
-    editPost(
-      postId,
-      {
-        title,
-        link,
-        description,
-        subgroup
-      }
-    );
+    editPost(postId, {
+      title,
+      link,
+      description,
+      subgroup,
+    });
 
     return res.redirect(`/posts/show/${postId}`);
   } catch (err) {
@@ -216,7 +209,6 @@ router.post("/edit/:postid", ensureAuthenticated, async (req, res) => {
       formData: req.body,
     });
   }
-
 });
 
 router.get("/deleteconfirm/:postid", ensureAuthenticated, async (req, res) => {
@@ -262,40 +254,37 @@ router.post(
   async (req, res) => {
     // remember how GET /posts/show/:postid has a form for comments? It submits to here. Look there
 
-  try {
-    const { description } = req.body
-    const user = await req.user
-    const postId = parseInt(req.params.postid);
-    const post = getPost(postId);
-    
-    if (!user) {
-      throw new Error("User session expired");
-    }
-    
-    if (!post) {
-      return res.status(404).render("error", {
-        message: "Post not found",
-      });
-    }
-    
-    if (!description) {
-      return res.redirect(`/posts/show/${postId}?error=Comment can't be empty`)
-    }
+    try {
+      const { description } = req.body;
+      const user = await req.user;
+      const postId = parseInt(req.params.postid);
+      const post = getPost(postId);
 
-    const newcomment = addComment(
-      postId,
-      user.id,
-      description,
-    )
+      if (!user) {
+        throw new Error("User session expired");
+      }
 
-    return res.redirect(`/posts/show/${postId}`);
-  } catch (err) {
-    
-    console.error("Comment creation error:", err);
-    
-    const postId = parseInt(req.params.postid)
+      if (!post) {
+        return res.status(404).render("error", {
+          message: "Post not found",
+        });
+      }
 
-    return res.redirect(`/posts/show/${postId}?error=Error creating comment`);
+      if (!description) {
+        return res.redirect(
+          `/posts/show/${postId}?error=Comment can't be empty`
+        );
+      }
+
+      const newcomment = addComment(postId, user.id, description);
+
+      return res.redirect(`/posts/show/${postId}`);
+    } catch (err) {
+      console.error("Comment creation error:", err);
+
+      const postId = parseInt(req.params.postid);
+
+      return res.redirect(`/posts/show/${postId}?error=Error creating comment`);
     }
   }
 );
